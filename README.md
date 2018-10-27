@@ -1,5 +1,5 @@
-# Tintin (Drools Expert 6.1.x)
-Code Samples for the Blog Article [Introduction to Rules Engine Using Drools Expert 6.1.x] 
+# Sherlock (Drools Fusion 6.1.x)
+Code Samples for the Blog Article [Introduction to Complex Event Processing Using Drools Fusion 6.1.x] 
 <br>
 
 MIT License
@@ -13,12 +13,12 @@ https://github.com/sumithpuri
 <br>
 
 	
-|Project Codename|Tintin|
+|Project Codename|Sherlock|
 |--|--|
-| Blog Post URL | http://www.techilashots.com/2015/09/introduction-to-rules-engine-using.html |
-|Blog Short URL	|https://goo.gl/ebAzZr|
-|Package Prefix|me.sumithpuri.github.tintin|
-|GitHub URL|https://github.com/sumithpuri/skp-code-marathon-tintin|
+| Blog Post URL | http://www.techilashots.com/2015/09/introduction-to-complex-event.html |
+|Blog Short URL	|https://goo.gl/hizRKA|
+|Package Prefix|me.sumithpuri.github.sherlock|
+|GitHub URL|https://github.com/sumithpuri/skp-code-marathon-sherlock|
 |Contact E-Mail  |code@sumithpuri.me|
 |Contact Number|+91 9591497974 (WhatsApp, Viber)|
 

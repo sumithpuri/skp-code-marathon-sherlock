@@ -19,7 +19,7 @@ import me.sumithpuri.github.sherlock.biz.vo.SherlockEvent;
 
  * GitHub URL 			https://github.com/sumithpuri
  * Blog Post URL		http://www.techilashots.com/2015/09/introduction-to-complex-event.html
- * Blog Short URL		https://goo.gl/ebAzZr
+ * Blog Short URL		https://goo.gl/hizRKA
  * Package Prefix 		me.sumithpuri.github.sherlock
  * Project Codename		sherlock
  * Contact E-Mail		code@sumithpuri.me
