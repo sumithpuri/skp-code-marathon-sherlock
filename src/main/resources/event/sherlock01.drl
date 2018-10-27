@@ -1,0 +1,72 @@
+package me.sumithpuri.github.sherlock.biz.cep;
+
+// list any import classes here.
+import me.sumithpuri.github.sherlock.biz.vo.SherlockEvent;
+import me.sumithpuri.github.sherlock.biz.vo.SherlockEventCorrelation;
+
+declare SherlockEvent
+	@role(event)
+	@expires(20s)
+	@timestamp (eventDestinationTimestamp)
+end
+
+declare SherlockEventCorrelation
+	@role(event)
+	@expires(20s)
+	@timestamp (eventDestinationTimestamp)
+end
+
+global Long startTime;
+global Long startMemory;
+global Long totalFactCount;
+global java.util.HashMap threatMap; 
+
+// use case 01
+// detect if there are more than ten port or ip scan attempts from the same ip address (and port) 
+// to the destination ip address (and multiple ports) in the given window
+rule "Port and IP Scan Event Processing Initial"
+dialect "mvel"
+no-loop
+  when
+    e1: SherlockEvent(eventType == "port and ip scan") over window:time(10s) 
+    not SherlockEventCorrelation(eventSourceIp == e1.eventSourceIp, eventDestinationIp == e1.eventDestinationIp, eventSourcePort == e1.eventSourcePort)  
+  then
+	  SherlockEventCorrelation plec = new SherlockEventCorrelation();
+	  plec.setEventSourceIp(e1.eventSourceIp);
+	  plec.setEventDestinationIp(e1.eventDestinationIp);
+	  plec.setEventSourcePort(e1.eventSourcePort);
+	  plec.setEventDestinationPort(e1.eventDestinationPort);
+	  plec.setEventCorrelation(0);
+	  insert(plec);
+end
+
+
+rule "Port and IP Scan Event Processing Correlation"
+dialect "mvel"
+no-loop
+  when
+    e1: SherlockEvent(eventType == "port and ip scan") over window:time(10s) 
+    ce: SherlockEventCorrelation(eventSourceIp == e1.eventSourceIp, eventDestinationIp == e1.eventDestinationIp, eventSourcePort == e1.eventSourcePort, $eventCorr : eventCorrelation >= 0)
+  then
+  	$eventCorr++;
+    ce.eventCorrelation=$eventCorr;
+    if(ce.eventCorrelation >= 10) {
+    	System.out.println("");
+		System.out.println("+++++++++++++++ USE CASE 01 +++++++++++++++");
+		System.out.println("SOURCE INET: " + ce.eventSourceIp);
+		System.out.println("SOURCE PORT: " + ce.eventSourcePort);
+		System.out.println("DESTIN INET: " + ce.eventDestinationIp);
+		System.out.println("EVENT  ACTN: " + "port and ip scan");
+		System.out.println("TIMESTAMP  : " + new java.util.Date(ce.eventDestinationTimestamp));
+		System.out.println("OCCURENCES : " + $eventCorr);
+		System.out.println("+++++++++++++++++++++++++++++++++++++++++++");
+		System.out.println("");
+    }  	
+    update( ce );
+    threatMap.put(new java.util.Date(), ce);
+end
+
+
+
+
+

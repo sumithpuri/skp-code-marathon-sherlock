@@ -1,0 +1,77 @@
+package me.sumithpuri.github.sherlock.biz.cep;
+
+// list any import classes here.
+import me.sumithpuri.github.sherlock.biz.vo.SherlockEvent;
+import me.sumithpuri.github.sherlock.biz.vo.SherlockEventCorrelation;
+
+declare SherlockEvent
+	@role(event)
+	@expires(70s)
+	@timestamp (eventDestinationTimestamp)
+end
+
+declare SherlockEventCorrelation
+	@role(event)
+	@expires(70s)
+	@timestamp (eventDestinationTimestamp)
+end
+
+global Long startTime;
+global Long startMemory;
+global Long totalFactCount;
+global java.util.HashMap threatMap; 
+
+// use case 03
+// detect if the traffic on a port x has all of sudden spiked than (and port) 
+// the history - average of the last one minute provided there were more than
+// five accesses
+rule "Specific Port Traffic Initial"
+dialect "mvel"
+no-loop
+  when
+    e1: SherlockEvent(eventType == "port access") over window:time(30s) 
+    not SherlockEventCorrelation(eventDestinationIp == e1.eventDestinationIp, eventDestinationPort == e1.eventDestinationPort)  
+  then
+  	  System.out.println("[EVENT] Port Access Detected");
+	  SherlockEventCorrelation plec = new SherlockEventCorrelation();
+	  plec.setEventSourceIp(e1.eventSourceIp);
+	  plec.setEventDestinationIp(e1.eventDestinationIp);
+	  plec.setEventSourcePort(e1.eventSourcePort);
+	  plec.setEventDestinationPort(e1.eventDestinationPort);
+	  plec.setEventDestinationUsername(e1.eventDestinationUsername);
+	  plec.setEventCorrelation(0);
+	  insert(plec);
+end
+
+
+rule "Specific Port Traffic Correlation"
+dialect "mvel"
+no-loop
+  when
+    e1: SherlockEvent(eventType == "port access") over window:time(30s) 
+    ce: SherlockEventCorrelation(eventDestinationIp == e1.eventDestinationIp, eventDestinationPort == e1.eventDestinationPort, $eventCorr : eventCorrelation >= 0)
+  then
+    System.out.println("[EVENT] Port Access Violation " + "*********************" + $eventCorr);
+  	$eventCorr++;
+    ce.eventCorrelation=$eventCorr;
+    if(ce.eventCorrelation >= 5) {
+    	System.out.println("");
+		System.out.println("+++++++++++++++ USE CASE 03 +++++++++++++++");
+		System.out.println("SOURCE INET: " + ce.eventSourceIp);
+		System.out.println("SOURCE PORT: " + ce.eventSourcePort);
+		System.out.println("DESTIN INET: " + ce.eventDestinationIp);
+		System.out.println("EVENT  ACTN: " + "port access");
+		System.out.println("EVENT USERN: " + ce.eventDestinationUsername);
+		System.out.println("TIMESTAMP  : " + new java.util.Date(ce.eventDestinationTimestamp));
+		System.out.println("OCCURENCES : " + $eventCorr);
+		System.out.println("+++++++++++++++++++++++++++++++++++++++++++");
+		System.out.println("");
+    }  	
+    update( ce );
+    threatMap.put(new java.util.Date(), ce);
+end
+
+
+
+
+
