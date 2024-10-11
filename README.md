@@ -1,7 +1,7 @@
 # Sherlock (Drools Fusion 6.1.x)
 Code Samples for the Blog Article - [ Introduction to Complex Event Processing Using Drools Fusion 6.1.x ] 
 <br>
-MIT License, Copyright (c) 2018-19, <a href="https://www.techcto.online">Sumith Kumar Puri</a><br>
+MIT License, Copyright (c) 2018-19, <a href="http://www.techcto.online">Sumith Kumar Puri</a><br>
 \[Note\] Societe Generale Brainwaves Hackathon 2015 (Corporate Finalist, Top 8, Track: Artificial Intelligence)<br>
 https://github.com/sumithpuri 
 <br>
